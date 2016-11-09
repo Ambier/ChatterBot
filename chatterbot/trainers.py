@@ -170,3 +170,35 @@ class TwitterTrainer(Trainer):
             statements = self.get_statements()
             for statement in statements:
                 self.storage.update(statement, force=True)
+
+
+class UbuntuCorpusTrainer(Trainer):
+
+    def extract(self, file_path):
+        import tarfile
+
+        self.logger.info('Starting file extraction')
+
+        extracted_directory_path = ''
+
+        def track_progress(members):
+            for member in members:
+                # this will be the current file being extracted
+                yield member
+                print('Extracting {}'.format(member))
+
+        with tarfile.open(file_path) as tar:
+            tar.extractall(members=track_progress(tar))
+
+        self.logger.info('File extraction complete')
+
+        return extracted_directory_path
+
+    def train(self):
+        import glob
+
+        # data_directory = self.extract('C:/Users/Gunther/GitHub/ChatterBot/examples/ubuntu_dialogs.tgz')
+        data_directory = 'C:/Users/Gunther/GitHub/ChatterBot/examples/ubuntu_dialogs/dialogs/'
+
+        for file in glob.glob(data_directory):
+            print('file:', file)
